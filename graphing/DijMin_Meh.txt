@@ -1,0 +1,56 @@
+func PathContains(path []Node, end *Node) bool {
+	for i := 0; i < len(path); i++ {
+		if strings.Compare(path[i].Name, end.Name) == 0 {
+			return true // path does contain
+		}
+	}
+
+	return false // path doesn't contain
+}
+
+func DestinationAdj(start, end *Node) bool {
+	for i := 0; i < len(start.Adj); i++ {
+		temp := strings.Split(start.Adj[i], ",")
+		if strings.Compare(temp[0], end.Name) == 0 {
+			return true // destination is adjacent
+		}
+	}
+
+	return false // destination is not adjacent
+}
+
+func GetBranch(name string, t *Tree) *Fringe {
+	for i := 0; i < len(t.Branches); i++ {
+		if strings.Compare(t.Branches[i].Main.Name, name) == 0 {
+			return &t.Branches[i]
+		}
+	}
+
+	return nil
+}
+
+func InPrevious(nodelist []string, checkfor string) bool {
+	for i := 0; i < len(nodelist); i++ {
+		if strings.Compare(nodelist[i], checkfor) == 0 {
+			return true // has already been looked at
+		}
+	}
+
+	return false
+}
+
+func CheckBranchesFor(t *Tree, lookat *Fringe, lookfor *Node, path []Node, pnodes []string) {
+	pnodes = append(pnodes, lookat.Main.Name)
+	for i := 0; i < len(lookat.Main.Adj); i++ {
+		temp := strings.Split(lookat.Main.Adj[i], ",")
+		if InPrevious(pnodes, temp[0]) == false {
+			if DestinationAdj(&lookat.Main, lookfor) == false {
+				newfringe := GetBranch(temp[0], t)
+				CheckBranchesFor(t, newfringe, lookfor, path, pnodes)
+			} else {
+				
+				path = append(path, lookat.Main)
+			}
+		}
+	}
+}
